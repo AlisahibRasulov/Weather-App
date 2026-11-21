@@ -14,14 +14,39 @@ import UVIndex from "./components/weather/UVIndex";
 import Visibility from "./components/weather/Visibility";
 import MapBanner from "./components/weather/MapBanner";
 import OtherCities from "./components/weather/OtherCities";
+import { useAsync } from "./hooks/useAsync";
+import { useEffect } from "react";
 
 
 function App() {
   // const [count, setCount] = useState(0)
+  const {
+    current,
+    forecast,
+    error,
+    isLoading,
+    isSuccess,
+    isError,
+    getWeather,
+  } = useAsync();
 
+    useEffect(() => {
+    getWeather("Baku");
+  }, []);
+    if (isLoading) {
+    return <h2>Loading...</h2>;
+  }
+
+  if (isError) {
+    return <h2 className="">{error}</h2>;
+  }
+
+  if (!isSuccess) {
+    return null;
+  }
   return (
     <>
-      <Navbar weather={currentWeather} />
+      <Navbar weather={current} getWeather={getWeather} />
       <div className="p-6 w-full flex justify-between items-start gap-6">
         {/* Left Side */}
         <div className="flex flex-col justify-between items-start gap-4 mb-6">
@@ -31,22 +56,22 @@ function App() {
           </div>
           <div className="min-w-0">
             <Routes>
-              <Route path="/" element={<SevenDaysWeather />} />
+              <Route path="/" element={<SevenDaysWeather weather={current} forecast={forecast} />} />
               <Route path="/todayweather" element={<TodayWeather />} />
               <Route path="/tomorrowweather" element={<TomorrowWeather />} />
             </Routes>
           </div>
 
           <h2 className="flex-1 text-white text-lg font-semibold">Today's Overview</h2>
-          <div className="flex justify-center items-start gap-4 mb-6">
+          <div className="flex justify-center items-start gap-14 mb-6">
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-start gap-4 mb-6">
-              <WindStatus weather={currentWeather} />
-              <UVIndex weather={currentWeather} />
+              <WindStatus weather={current} />
+              <UVIndex weather={current} />
             </div>
             <div className="flex justify-between items-start gap-4 mb-6">
-              <Humidity weather={currentWeather} />
-              <Visibility weather={currentWeather} />
+              <Humidity weather={current} />
+              <Visibility weather={current} />
             </div>
           </div>
             <MapBanner />
